@@ -1,0 +1,6 @@
+# Langfuse 101 — Python 依賴
+# langfuse>=3 會安裝到 v4 系列(OpenTelemetry-based SDK)。
+# 若要鎖定,可改成 langfuse>=3,<5
+langfuse>=3
+openai>=1.30
+python-dotenv>=1.0
