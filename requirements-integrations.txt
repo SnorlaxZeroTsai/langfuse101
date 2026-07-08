@@ -1,0 +1,16 @@
+# Stage 7 整合範例的額外依賴(與核心練習分開裝,避免污染 requirements.txt 環境)。
+# 先裝好核心的 requirements.txt,再裝這個。
+
+# --- 7.1 LiteLLM(可跑)---
+litellm>=1.50
+
+# --- 7.4 LangChain(可跑)---
+langchain>=0.3
+langchain-openai>=0.2
+
+# --- 7.2 Google ADK(骨架;需要時再自行安裝,且需 Google API key)---
+# google-adk
+# openinference-instrumentation-google-adk
+
+# --- 7.3 A2A(骨架;OTel 傳播示範用的 opentelemetry 已隨 langfuse 一併安裝)---
+# a2a-sdk            # 若要接真實 A2A 實作再裝

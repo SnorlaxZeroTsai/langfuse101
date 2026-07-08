@@ -1,0 +1,33 @@
+# Stage 7.1 — LiteLLM Proxy(gateway)設定,對應「多雲評估」情境。
+#
+# 啟動:  litellm --config litellm_config.yaml
+# 之後把任何 OpenAI-相容 client 的 base_url 指向這個 proxy(預設 http://localhost:4000),
+# client 只認得下面的統一 model_name,不知道背後是哪一家雲。
+# 所有經過 gateway 的流量都會透過 langfuse_otel callback 進 Langfuse,
+# 於是你能在同一個 dashboard 比較不同雲 model 的 cost / latency / 錯誤率。
+
+model_list:
+  # 統一對外名稱 → 背後真正的 provider/model。client 只看到 model_name。
+  - model_name: gpt-4o-mini
+    litellm_params:
+      model: openai/gpt-4o-mini
+      api_key: os.environ/OPENAI_API_KEY
+
+  - model_name: claude          # 同一個 gateway 背後接不同雲
+    litellm_params:
+      model: anthropic/claude-sonnet-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+
+  # 想評估 self-host / 本機模型,也可以掛 OpenAI-相容端點:
+  # - model_name: local-llm
+  #   litellm_params:
+  #     model: openai/whatever
+  #     api_base: http://localhost:11434/v1
+
+litellm_settings:
+  # 整個 gateway 的流量都送 Langfuse(OTel 路徑)。並存:不影響 LiteLLM 其他 logging。
+  callbacks: ["langfuse_otel"]
+
+# 需要的環境變數(可放 .env 或 export):
+#   LANGFUSE_PUBLIC_KEY, LANGFUSE_SECRET_KEY, LANGFUSE_HOST(self-host = http://localhost:3000)
+#   OPENAI_API_KEY / ANTHROPIC_API_KEY(對應上面掛的雲)

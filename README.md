@@ -27,7 +27,11 @@ langfuse101/
 │   ├── s3_sessions.py       # Stage 3:多輪 REPL + session/user
 │   ├── s4_scores.py         # Stage 4:三種 score
 │   ├── s5_prompts.py        # Stage 5:版本化 prompt(從 Langfuse 拉)
-│   └── s6_capstone.py       # Stage 6:全套整合的 agent CLI
+│   ├── s6_capstone.py       # Stage 6:全套整合的 agent CLI
+│   └── integrations/        # Stage 7:框架 / gateway 整合範例
+├── docs/
+│   ├── integrations.md      # Stage 7:LiteLLM / Google ADK / A2A / LangChain
+│   └── advanced.md          # Stage 8:進階概念(我選的,附為什麼值得學)
 └── notes/when-to-use-what.md  # 決策筆記(能力驗收)
 ```
 
@@ -117,8 +121,35 @@ cd .langfuse-src && docker compose down        # 停止 Langfuse(保留資料)
 # docker compose down -v                       # 連同資料一起清掉
 ```
 
-## 選配延伸(貼近你的工作)
+## Stage 7 — 框架與 Gateway 整合
 
-- **框架整合對照**:用 LangChain + Langfuse `CallbackHandler` 跑等價 agent,
-  對比「框架自動 trace」與「手刻 trace」的差異。
+手刻練完後,真實情況是「LLM 呼叫被別人的框架/gateway 包住」。這一章看四種整合模式
+如何接進 Langfuse,並綁定你的情境(多雲 gateway、MCP 跨 agent)。完整內容:
+**[docs/integrations.md](docs/integrations.md)**。
+
+```bash
+pip install -r requirements-integrations.txt   # 整合範例的額外依賴
+cd src/integrations
+python s7_litellm_gateway.py      # 7.1 LiteLLM 多雲 gateway(可跑,需 OPENAI_API_KEY)
+python s7_langchain_agent.py      # 7.4 LangChain 重建 Stage 2 對照(可跑)
+# 7.2 s7_google_adk_agent.py / 7.3 s7_a2a_tracing.py 為帶註解骨架(見檔頭)
+```
+
+四者整合模式差異(機制 / 取代 vs 並存 / 坑)見 integrations.md 的比較表。
+
+## Stage 8 — 進階概念(值得深入的主題)
+
+不是功能清單,而是**從「導入內部 agent 平台」目標出發、排序過**的深入主題,
+每個說明「為什麼值得學」,cost 準確度與多 agent session 等爭議點附上判斷:
+**[docs/advanced.md](docs/advanced.md)**。
+
+1. OTel 資料模型 + 跨邊界 context 傳播(遷移價值最高)
+2. 多 agent 的 trace 拓樸 + session 模糊地帶(爭議)
+3. Cost tracking 準確度真相(爭議)
+4. Sampling + PII masking + self-host 規模化(上線生死線)
+5. Evaluation / dataset / LLM-judge(高價值,快速演變中)
+
+## 選配延伸
+
 - **MCP 情境**:把 `tools.py` 的 mock 工具換成走真實 MCP 呼叫的工具,觀察 trace 如何跨 MCP 邊界。
+  (跨邊界 context 傳播的通用做法見 Stage 7.3 與 docs/advanced.md 第 1 章。)
